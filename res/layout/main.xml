@@ -1,41 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content"
-    android:layout_marginTop="10dip" 
-    android:layout_marginLeft="10dip"
-    android:layout_marginRight="10dip"
-    android:text="@string/title"
-    />
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:layout_marginTop="10dip" 
-    android:layout_marginLeft="10dip"
-    android:layout_marginRight="10dip"
-    android:text="@string/description"
-    />
-<TableLayout
-	android:layout_width="wrap_content"
-	android:layout_height="wrap_content"
-	android:layout_gravity="center_horizontal"
-	android:layout_marginTop="40dip">
-	<TableRow>
-		<ImageButton
-			android:id="@+id/safe_button"
-			android:layout_width="140dip"
-			android:layout_height="140dip"
-			android:src="@drawable/safty"/>
-		<ImageButton
-			android:id="@+id/danger_button"
-			android:layout_width="140dip"
-			android:layout_height="140dip"
-			android:src="@drawable/danger"/>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@android:id/tabcontent"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/sendTabView"
+	    android:orientation="vertical"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent">
+		<TextView  
+		    android:layout_width="fill_parent" 
+		    android:layout_height="wrap_content"
+		    android:layout_marginTop="10dip" 
+		    android:layout_marginLeft="10dip"
+		    android:layout_marginRight="10dip"
+		    android:text="@string/title"
+		    />
+		<TextView  
+		    android:layout_width="fill_parent" 
+		    android:layout_height="wrap_content" 
+		    android:layout_marginTop="10dip" 
+		    android:layout_marginLeft="10dip"
+		    android:layout_marginRight="10dip"
+		    android:text="@string/description"
+		    />
+		<TableLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_horizontal"
+			android:layout_marginTop="40dip">
+			<TableRow>
+				<ImageButton
+					android:id="@+id/safe_button"
+					android:layout_width="140dip"
+					android:layout_height="140dip"
+					android:src="@drawable/safty"/>
+				<ImageButton
+					android:id="@+id/danger_button"
+					android:layout_width="140dip"
+					android:layout_height="140dip"
+					android:src="@drawable/danger"/>
+			</TableRow>
+		</TableLayout>
+	</LinearLayout>
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/searchTabView"
+	    android:orientation="vertical"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent">
+		<TableLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_horizontal"
+			android:layout_marginTop="10dip">
+			<TableRow>
+				<EditText android:id="@+id/phoneNumberText" 
+					android:layout_height="wrap_content" 
+					android:layout_width="fill_parent" 
+					android:inputType="phone"
+					android:hint="@string/text_hint_phone_number"/>
+				<Button android:text="@string/button_search" 
+					android:id="@+id/search_button" 
+					android:layout_width="wrap_content" 
+					android:layout_height="wrap_content"/>
+			</TableRow>
+		</TableLayout>
+		<ListView android:id="@+id/result_list" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:divider="@color/white"
+			android:layout_marginTop="10dip"
+			android:dividerHeight="1dip">
+		</ListView>
+	</LinearLayout>
+</FrameLayout>
 
-	</TableRow>
-</TableLayout>
-</LinearLayout>

@@ -8,5 +8,6 @@ public interface Constants {
 	String PARAM_PHONE_NUMBER = "phoneNumber";
 	String PARAM_LOCATION = "location";
 	
-	String BUJI_SEND_URL = "http://bujicheck.appspot.com/bujicheck";
+	String BUJI_SEND_URL = "http://bujicheck.appspot.com/bujisend";
+	String BUJI_CHECK_URL = "http://bujicheck.appspot.com/bujicheck";
 }

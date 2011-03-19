@@ -3,6 +3,10 @@ package com.lizhenghome.android.bujicheck;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -12,29 +16,39 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.HTTP;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.TabActivity;
 import android.content.DialogInterface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
-import android.os.Looper;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TabHost;
 import android.widget.Toast;
 
-public class BujiSendActivity extends Activity implements LocationListener{
+public class BujiSendActivity extends TabActivity implements LocationListener{
     /** Called when the activity is first created. */
 	
 	private ImageButton safeBtn;
 	
 	private ImageButton dangerBtn;
+	
+	private Button searchBtn;
 	
 	private LocationManager mLocationManager;
 	
@@ -46,10 +60,25 @@ public class BujiSendActivity extends Activity implements LocationListener{
 	
 	private static final int DIALOG_PROGRESS_KEY = 1;
 	
+	private ListView resultList;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        //setContentView(R.layout.main);
+        
+        TabHost tabHost = getTabHost();
+        tabHost.setup();
+        
+        LayoutInflater.from(this).inflate(R.layout.main, tabHost.getTabContentView(), true);
+        tabHost.addTab(tabHost.newTabSpec("tab1")
+                .setIndicator(getString(R.string.tab_label_send))
+                .setContent(R.id.sendTabView));
+        tabHost.addTab(tabHost.newTabSpec("tab2")
+        		.setIndicator(getString(R.string.tab_label_search))
+        		.setContent(R.id.searchTabView));
+        
+        tabHost.setCurrentTab(0);
         
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         
@@ -71,6 +100,99 @@ public class BujiSendActivity extends Activity implements LocationListener{
 				confirmSelection(Constants.BUJI_STATUS_DANGER);
 			}
 		});
+        
+        searchBtn = (Button)findViewById(R.id.search_button);
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				searchBujiInfo();
+			}
+		});
+        
+        resultList = (ListView)findViewById(R.id.result_list);
+        resultList.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position,
+					long id) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+    }
+    
+    private void searchBujiInfo() {
+    	showDialog(DIALOG_PROGRESS_KEY);
+    	Thread t = new Thread() {
+    		public void run() {
+    			HttpClient client = new DefaultHttpClient();
+    			HttpConnectionParams.setConnectionTimeout(client.getParams(), 10000);
+    			HttpResponse response;
+    			JSONObject json = new JSONObject();
+    			HttpPost post = new HttpPost(Constants.BUJI_CHECK_URL);
+    			try {
+					json.put(Constants.PARAM_PHONE_NUMBER, "08033491218");
+					StringEntity se = new StringEntity("JSON: " + json.toString());
+	    			se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+	    			post.setEntity(se);
+	    			response = client.execute(post);
+	    			
+	    			if(response!=null){
+	    				InputStream in = response.getEntity().getContent(); //Get the data in the entity
+	    				BufferedReader br = new BufferedReader(new InputStreamReader(in));
+	    				
+	    				StringBuffer jsonResult = new StringBuffer();
+	    				String line = null;
+	    				while((line = br.readLine()) != null) {
+	    					jsonResult.append(line);
+	    				}
+	    				final List<BujiInfoItem> items = new ArrayList<BujiInfoItem>();
+	    				JSONArray jsonArray = new JSONArray(jsonResult.toString());
+	    				for(int i=0; i < jsonArray.length(); i++) {
+	    					JSONObject jsonObject = jsonArray.getJSONObject(i);
+	    					BujiInfoItem item = new BujiInfoItem();
+	    					item.setId(jsonObject.getLong("id"));
+	    					item.setPhoneNumber(jsonObject.getString("phoneNumber"));
+	    					item.setPosition(jsonObject.getString("position"));
+	    					item.setBujiStatus(jsonObject.getString("bujiStatus"));
+	    					JSONObject date = jsonObject.getJSONObject("sendDate");
+	    					long time = date.getLong("time");
+	    					Calendar cal = Calendar.getInstance();
+	    					cal.clear();
+	    					cal.setTimeInMillis(time);
+	    					item.setSendDate(cal.getTime());
+	    					items.add(item);
+	    				}
+	    				
+	    				dismissDialog(DIALOG_PROGRESS_KEY);
+	        			runOnUiThread(new Runnable() {
+	    					
+	    					@Override
+	    					public void run() {
+	    				    	ListAdapter adapter = new SearchResultArrayAdaptor(BujiSendActivity.this, R.layout.result, items);
+	    				    	resultList.setAdapter(adapter);
+	    					}
+	    				});
+	    			}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+    		}
+    	};
+    	t.start();
+    	/*
+    	List<BujiInfoItem> items = new ArrayList<BujiInfoItem>();
+    	BujiInfoItem item = new BujiInfoItem();
+    	item.setPhoneNumber("08033491218");
+    	item.setSendDate(new Date());
+    	item.setPosition("");
+    	item.setBujiStatus("0");
+    	items.add(item);
+     	items.add(item);
+         */ 	
     }
     
     private void confirmSelection(int bujiStatus) {

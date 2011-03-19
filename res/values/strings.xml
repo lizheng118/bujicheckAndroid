@@ -12,4 +12,10 @@
     <string name="confirm_message_danger">あなたは今危険であることを送信しますか？</string>
     <string name="progressing">通信中、お待ちください。</string>
     <string name="progressed">送信しました。</string>
+    <string name="tab_label_send">安否状況送信</string>
+    <string name="tab_label_search">安否状況確認</string>
+    <string name="text_hint_phone_number">電話番号を入力してください</string>
+    <string name="button_search">検索</string>
+    <string name="list_label_send">送信日時：</string>
+    <string name="list_map_button">地図</string>
 </resources>
