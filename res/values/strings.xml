@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">無事チェック</string>
+    <string name="title">あなたは今無事ですか？</string>
+    <string name="description">
+    （地震、津波など自然災害が発生する後、自分の安否状況を送信することによって、
+    親族や友人があなたが無事であるかを確認することができます。
+    万か一、危険の場合は、あなたのいる場所が参照することによって、救援に繋ぐことができます）</string>
+    <string name="confirm_send">送信</string>
+    <string name="confirm_cancel">キャンセル</string>
+    <string name="confirm_message_safe">あなたは今無事であることを送信しますか？</string>
+    <string name="confirm_message_danger">あなたは今危険であることを送信しますか？</string>
+    <string name="progressing">通信中、お待ちください。</string>
+    <string name="progressed">送信しました。</string>
+</resources>
