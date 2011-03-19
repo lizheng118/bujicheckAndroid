@@ -25,6 +25,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TabActivity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -117,9 +118,14 @@ public class BujiSendActivity extends TabActivity implements LocationListener{
 			public void onItemClick(AdapterView<?> parent, View view, int position,
 					long id) {
 				// TODO Auto-generated method stub
-				
+				showDetail();
 			}
 		});
+    }
+    
+    private void showDetail() {
+    	Intent launchDetail = new Intent(this, BujiDetailActivity.class);
+    	startActivity(launchDetail);
     }
     
     private void searchBujiInfo() {
