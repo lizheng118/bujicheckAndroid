@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -17,7 +16,6 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
@@ -36,6 +34,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -62,6 +61,8 @@ public class BujiSendActivity extends TabActivity implements LocationListener{
 	private static final int DIALOG_PROGRESS_KEY = 1;
 	
 	private ListView resultList;
+	
+	private EditText phoneNumberText;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -112,20 +113,24 @@ public class BujiSendActivity extends TabActivity implements LocationListener{
 		});
         
         resultList = (ListView)findViewById(R.id.result_list);
-        resultList.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position,
-					long id) {
-				// TODO Auto-generated method stub
-				showDetail();
-			}
-		});
+//        resultList.setOnItemClickListener(new OnItemClickListener() {
+//
+//			@Override
+//			public void onItemClick(AdapterView<?> parent, View view, int position,
+//					long id) {
+//				showDetail(position);
+//			}
+//		});
+        
+        phoneNumberText = (EditText)findViewById(R.id.phoneNumberText);
     }
     
-    private void showDetail() {
-    	Intent launchDetail = new Intent(this, BujiDetailActivity.class);
-    	startActivity(launchDetail);
+    private void showDetail(BujiInfoItem item) {
+    	if(item.getPosition() != null && !"".equals(item.getPosition())) {
+	    	Intent launchDetail = new Intent(this, BujiDetailActivity.class);
+	    	launchDetail.putExtra("position", item.getPosition());
+	    	startActivity(launchDetail);
+    	}
     }
     
     private void searchBujiInfo() {
@@ -138,8 +143,8 @@ public class BujiSendActivity extends TabActivity implements LocationListener{
     			JSONObject json = new JSONObject();
     			HttpPost post = new HttpPost(Constants.BUJI_CHECK_URL);
     			try {
-					json.put(Constants.PARAM_PHONE_NUMBER, "08033491218");
-					StringEntity se = new StringEntity("JSON: " + json.toString());
+					json.put(Constants.PARAM_PHONE_NUMBER, phoneNumberText.getText());
+					StringEntity se = new StringEntity(json.toString());
 	    			se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
 	    			post.setEntity(se);
 	    			response = client.execute(post);
@@ -162,12 +167,15 @@ public class BujiSendActivity extends TabActivity implements LocationListener{
 	    					item.setPhoneNumber(jsonObject.getString("phoneNumber"));
 	    					item.setPosition(jsonObject.getString("position"));
 	    					item.setBujiStatus(jsonObject.getString("bujiStatus"));
-	    					JSONObject date = jsonObject.getJSONObject("sendDate");
-	    					long time = date.getLong("time");
-	    					Calendar cal = Calendar.getInstance();
-	    					cal.clear();
-	    					cal.setTimeInMillis(time);
-	    					item.setSendDate(cal.getTime());
+	    					
+	    					if (!JSONObject.NULL.equals(jsonObject.get("sendDate"))) {
+		    					JSONObject date = jsonObject.getJSONObject("sendDate");
+		    					long time = date.getLong("time");
+		    					Calendar cal = Calendar.getInstance();
+		    					cal.clear();
+		    					cal.setTimeInMillis(time);
+		    					item.setSendDate(cal.getTime());
+	    					}
 	    					items.add(item);
 	    				}
 	    				
@@ -178,6 +186,15 @@ public class BujiSendActivity extends TabActivity implements LocationListener{
 	    					public void run() {
 	    				    	ListAdapter adapter = new SearchResultArrayAdaptor(BujiSendActivity.this, R.layout.result, items);
 	    				    	resultList.setAdapter(adapter);
+	    				    	
+	    				        resultList.setOnItemClickListener(new OnItemClickListener() {
+
+	    							@Override
+	    							public void onItemClick(AdapterView<?> parent, View view, int position,
+	    									long id) {
+	    								showDetail(items.get(position));
+	    							}
+	    						});
 	    					}
 	    				});
 	    			}
@@ -189,16 +206,6 @@ public class BujiSendActivity extends TabActivity implements LocationListener{
     		}
     	};
     	t.start();
-    	/*
-    	List<BujiInfoItem> items = new ArrayList<BujiInfoItem>();
-    	BujiInfoItem item = new BujiInfoItem();
-    	item.setPhoneNumber("08033491218");
-    	item.setSendDate(new Date());
-    	item.setPosition("");
-    	item.setBujiStatus("0");
-    	items.add(item);
-     	items.add(item);
-         */ 	
     }
     
     private void confirmSelection(int bujiStatus) {
@@ -272,9 +279,9 @@ public class BujiSendActivity extends TabActivity implements LocationListener{
 	    			if(isLocationAvailable) {
 	    				json.put(Constants.PARAM_LOCATION, latitude + "," + longitude);
 	    			} else {
-	    				json.put(Constants.PARAM_LOCATION, "");
+	    				json.put(Constants.PARAM_LOCATION, "35455281,139629711");
 	    			}
-	    			StringEntity se = new StringEntity("JSON: " + json.toString());
+	    			StringEntity se = new StringEntity(json.toString());
 	    			se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
 	    			post.setEntity(se);
 	    			response = client.execute(post);

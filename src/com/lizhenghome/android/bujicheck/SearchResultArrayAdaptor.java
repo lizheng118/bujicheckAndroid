@@ -50,9 +50,11 @@ public class SearchResultArrayAdaptor extends ArrayAdapter<BujiInfoItem> {
 		}
 		
 		TextView textView = (TextView)view.findViewWithTag("text");
-
-		textView.setText(df.format(item.getSendDate()));
-		
+		if(item.getSendDate() != null) {
+			textView.setText(df.format(item.getSendDate()));
+		} else {
+			textView.setText("");
+		}
 		return view;
 	}
 

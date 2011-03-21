@@ -28,7 +28,15 @@ public class BujiDetailActivity extends MapActivity {
 		mapView = (MapView)findViewById(R.id.mapview);
         MapController c = mapView.getController();
         c.setZoom(15);
-        c.setCenter(new GeoPoint(35455281,139629711));
+        
+        String position = getIntent().getStringExtra("position");
+        if(position != null && position.indexOf(',') > 0) {
+        	String[] positionArray = position.split(",");
+        	if(positionArray.length == 2) {
+        		 c.setCenter(new GeoPoint(Integer.parseInt(positionArray[0]),Integer.parseInt(positionArray[1])));
+        	}
+         }
+       
 
 	}
 
